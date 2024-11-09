@@ -1,26 +1,34 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Library.Models
+namespace LibraryAPI.Models
 {
-    public class Book {
-        public int Id {set; get;}
-        public string Title {get; set;}
-        public string Author {get; set;}
+	public class Book
+	{
+		[Key]
+		public int Id { set; get; }
 
-        public ICollection<ReadingSession> ReadingSessions {get; set;}
+		[Required, MaxLength(128)]
+		public required string Title { get; set; }
 
-        [ColumnAttribute(TypeName = "nvarchar(20)")]
-        public Ganre Ganre {get;set;}
-    }
+		[Required, MaxLength(128)]
+		public required string Author { get; set; }
+
+		public ICollection<ReadingSession>? ReadingSessions { get; set; }
+
+		[Column(TypeName = "varchar(20)")]
+		public Ganre Ganre { get; set; }
+	}
 
 
-    public enum Ganre {
-        FANTASY,
-        ACTION,
-        MYSTERY,
-        HORROR,
-        HISTORICAL,
-        ROMANCE,
-    }
+	public enum Ganre
+	{
+		FANTASY,
+		ACTION,
+		MYSTERY,
+		HORROR,
+		HISTORICAL,
+		ROMANCE,
+	}
 
 }

@@ -14,12 +14,15 @@
         "outputPath": "C:\\Users\\dimas\\LibraryAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\dimas\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\dimas\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -51,7 +54,19 @@
               "target": "Package",
               "version": "[8.0.10, )"
             },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
             "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
               "target": "Package",
               "version": "[8.0.10, )"
             },
@@ -59,13 +74,25 @@
               "target": "Package",
               "version": "[8.2.0, )"
             },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[8.0.6, )"
+            },
             "Microsoft.entityframeworkcore": {
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
               "version": "[8.0.10, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
-              "version": "[6.6.2, )"
+              "version": "[6.7.0, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.0.0, )"
             }
           },
           "imports": [
