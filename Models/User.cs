@@ -17,5 +17,8 @@ namespace LibraryAPI.Models
 		public required string Password { get; set; }
 
 		public ICollection<ReadingSession>? ReadingSessions { get; set; }
+
+		[Required]
+		public required Statistic Statistic { get; set; }
 	}
 }

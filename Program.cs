@@ -5,6 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using LibraryAPI.Data;
+using LibraryAPI.Services;
+using Microsoft.AspNetCore.Identity;
+using LibraryAPI.Models;
+using LibraryAPI.Services.Implaments;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +50,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddSingleton<IPasswordHasher<User>,  PasswordHasher<User>>();
 
 // Configure JWT authentication
 

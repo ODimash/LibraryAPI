@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LibraryAPI.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,23 +13,40 @@ namespace LibraryAPI.Controllers
 	public class AuthController : ControllerBase
 	{
 		private readonly IConfiguration _configuration;
+		private readonly IUserService _userService;
 
-		public AuthController(IConfiguration configuration) => _configuration = configuration;
+		public AuthController(IConfiguration configuration, IUserService userService)
+		{
+			_configuration = configuration;
+			_userService = userService;
+		}
 
 		[HttpPost("login")]
 		public IActionResult Login([FromBody] LoginRequest request)
 		{
-			// Проверка пользователя (здесь должна быть ваша логика аутентификации)
-			if (request.Username == "your-username" && request.Password == "your-password")
+			var User = _userService.Authenticate(request.Email, request.Password);
+			if (User == null)
 			{
-				var token = GenerateJwtToken(request.Username);
-				return Ok(new { token });
-			}
-
-			return Unauthorized();
+				return Unauthorized();
+			}		
+			var token = GenerateJwtToken(request.Email);
+			return Ok(new { token });
 		}
 
-		private string GenerateJwtToken(string username)
+		[HttpPost("register")]
+		public IActionResult Register([FromBody] RegisterRequest registerRequest)
+		{	
+			var User = _userService.Register(registerRequest.Email, registerRequest.Password, registerRequest.Name);
+			if (User == null)
+			{
+				return Unauthorized();
+			}
+
+			var token = GenerateJwtToken(User.Email);
+			return Ok(new { token });
+		}
+
+		private string GenerateJwtToken(string Email)
 		{
 			var jwtSettings = _configuration.GetSection("JwtSettings");
 			var secretKey = jwtSettings["SecretKey"] ?? throw new Exception("SecretKey is cannot be null");
@@ -36,7 +55,7 @@ namespace LibraryAPI.Controllers
 
 			var claims = new[]
 			{
-			new Claim(JwtRegisteredClaimNames.Sub, username),
+			new Claim(JwtRegisteredClaimNames.Sub, Email),
 			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 		};
 
@@ -53,7 +72,14 @@ namespace LibraryAPI.Controllers
 
 	public class LoginRequest
 	{
-		public required string Username { get; set; }
+		public required string Email { get; set; }
+		public required string Password { get; set; }
+	}
+
+	public class RegisterRequest
+	{
+		public required string Email { get; set; }
+		public required string Name {  get; set; }
 		public required string Password { get; set; }
 	}
 }
