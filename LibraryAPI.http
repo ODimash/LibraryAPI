@@ -10,3 +10,8 @@ Content-Type: application/json
 ### Запрос на доступ к защищенному эндпоинту с использованием сохраненного токена
 GET http://localhost:5063/api/TEst/test
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ5b3VyLXVzZXJuYW1lIiwianRpIjoiYWFhMWMyOWItYTU0MS00NGNjLTkzNjYtZTMzMTA0MTYwYjA5IiwiZXhwIjoxNzMxMTY0NjE4LCJpc3MiOiJMaWJyYXJ5QXBpSXNzdWVyIiwiYXVkIjoiTGlicmFyeSJ9.crNnHP3qAUUWUwADrRwsfRnhzl7olE8WIG00_14_2wI
+
+### Обновление оболочки книги
+POST http://localhost:5063/api/upload/book-cover/1
+Content-Type: multipart/form-data
+# File: 

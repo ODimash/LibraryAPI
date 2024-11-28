@@ -31,12 +31,12 @@ namespace LibraryAPI.Services.Implaments
             {
                 return null;
             }
-            var newUser = new User { Email = email, Password = password, Name = name, Statistic = new Statistic { BooksRead = 0, PagesRead = 0, ReadingTime = 0 } };
-            Console.WriteLine("New user was registred: %s, %s", newUser.Email, newUser.Name);
-            newUser.Password = _passwordHasher.HashPassword(newUser, password);
-            _context.Users.Add(newUser);
+			var NewUser = new User { Email = email, Password = password, Name = name };
+            NewUser.Statistic = new Statistic { BooksRead = 0, ReadingTime = 0, User = NewUser };
+            NewUser.Password = _passwordHasher.HashPassword(NewUser, password);
+            _context.Users.Add(NewUser);
             _context.SaveChanges();
-            return newUser;
+            return NewUser;
         }
     }
 }

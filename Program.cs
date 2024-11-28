@@ -2,13 +2,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using LibraryAPI.Data;
 using LibraryAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using LibraryAPI.Models;
 using LibraryAPI.Services.Implaments;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +24,8 @@ if (string.IsNullOrEmpty(secretKey))
 	throw new ArgumentNullException(nameof(secretKey), "SecretKey is not configured in the appsettings.json");
 }
 
+builder.Services.AddAuthorization();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 	.AddJwtBearer(options =>
 {
@@ -32,24 +33,49 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 	options.SaveToken = true;
 	options.TokenValidationParameters = new TokenValidationParameters
 	{
-		ValidateIssuer = true,
+		ValidateIssuer = false,
 		ValidIssuer = jwtSettings["Issuer"],
-		ValidateAudience = true,
+		ValidateAudience = false,
 		ValidAudience = jwtSettings["Audience"],
 		ValidateLifetime = false,
-		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+		IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey)),
 		ValidateIssuerSigningKey = true,
 		ClockSkew = TimeSpan.Zero,
 	};
 });
 
 
-builder.Services.AddAuthorization();
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(opt =>
+{
+	opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MyAPI", Version = "v1" });
+	opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+	{
+		In = ParameterLocation.Header,
+		Description = "Please enter token",
+		Name = "Authorization",
+		Type = SecuritySchemeType.Http,
+		BearerFormat = "JWT",
+		Scheme = "bearer"
+	});
+	opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+	{
+		{
+			new OpenApiSecurityScheme
+			{
+				Reference = new OpenApiReference
+				{
+					Type=ReferenceType.SecurityScheme,
+					Id="Bearer"
+				}
+			},
+			new string[]{}
+		}
+	});
+});
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSingleton<IPasswordHasher<User>,  PasswordHasher<User>>();
 
@@ -73,6 +99,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseStaticFiles();
 
 app.MapControllers();
 

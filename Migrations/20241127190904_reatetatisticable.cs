@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LibraryAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class reatetatisticable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,6 +20,12 @@ namespace LibraryAPI.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Title = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     Author = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    PublishedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ContextPath = table.Column<string>(type: "text", nullable: false),
+                    CoverPath = table.Column<string>(type: "text", nullable: false),
+                    RatingCount = table.Column<int>(type: "integer", nullable: false),
+                    Rating = table.Column<int>(type: "integer", nullable: false),
                     Ganre = table.Column<string>(type: "varchar(20)", nullable: false)
                 },
                 constraints: table =>
@@ -71,6 +77,28 @@ namespace LibraryAPI.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Statistic",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    BooksRead = table.Column<int>(type: "integer", nullable: false),
+                    ReadingTime = table.Column<int>(type: "integer", nullable: false),
+                    FavoriteGanre = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Statistic", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Statistic_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_ReadingSessions_BookId",
                 table: "ReadingSessions",
@@ -80,6 +108,12 @@ namespace LibraryAPI.Migrations
                 name: "IX_ReadingSessions_UserId",
                 table: "ReadingSessions",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Statistic_UserId",
+                table: "Statistic",
+                column: "UserId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -87,6 +121,9 @@ namespace LibraryAPI.Migrations
         {
             migrationBuilder.DropTable(
                 name: "ReadingSessions");
+
+            migrationBuilder.DropTable(
+                name: "Statistic");
 
             migrationBuilder.DropTable(
                 name: "Books");

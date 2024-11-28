@@ -9,26 +9,26 @@ namespace LibraryAPI.Models
 		[Key]
 		public int Id { set; get; }
 
-		[Required, MaxLength(128)]
+		[MaxLength(128)]
 		public required string Title { get; set; }
 
-		[Required, MaxLength(128)]
+		[MaxLength(128)]
 		public required string Author { get; set; }
 
-		[Required, MinLength(128)]
-		public required string Description { get; set; }
+		[MinLength(128)]
+		public required  string Description { get; set; }
 
-		[Required]
-		public required Context Context { get; set; }
+		public required DateTime PublishedDate { get; set; }
 
-		[Required]
-		public required string Cover { get; set; }
+		public required string ContextPath { get; set; }
+
+		public required string CoverPath { get; set; }
 
 		public required int RatingCount { get; set; } = 0;
 		public required int Rating { get; set; } = 5;
 
 		[JsonIgnore]
-		[Required, MaxLength(128)]
+		[MaxLength(128)]
 		public ICollection<ReadingSession>? ReadingSessions { get; set; }
 
 		[Column(TypeName = "varchar(20)")]

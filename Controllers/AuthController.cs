@@ -50,7 +50,7 @@ namespace LibraryAPI.Controllers
 		{
 			var jwtSettings = _configuration.GetSection("JwtSettings");
 			var secretKey = jwtSettings["SecretKey"] ?? throw new Exception("SecretKey is cannot be null");
-			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+			var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
 			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
 			var claims = new[]

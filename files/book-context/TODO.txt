@@ -1,0 +1,2 @@
+- Что делать?
+	- Добавить возможность хранение файлов: Book.Cover, Book.Context, User.photo;

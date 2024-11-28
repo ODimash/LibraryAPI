@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibraryAPI.Models
 {
@@ -19,6 +20,6 @@ namespace LibraryAPI.Models
 		public ICollection<ReadingSession>? ReadingSessions { get; set; }
 
 		[Required]
-		public required Statistic Statistic { get; set; }
+		public Statistic? Statistic { get; set; }
 	}
 }
