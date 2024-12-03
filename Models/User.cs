@@ -21,5 +21,8 @@ namespace LibraryAPI.Models
 
 		[Required]
 		public Statistic? Statistic { get; set; }
+
+		[Required, Column(TypeName = "varchar(16)")]
+		public Role Role { get; set; }
 	}
 }

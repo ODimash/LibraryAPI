@@ -31,7 +31,7 @@ namespace LibraryAPI.Models
 		[MaxLength(128)]
 		public ICollection<ReadingSession>? ReadingSessions { get; set; }
 
-		[Column(TypeName = "varchar(20)")]
+		[Column(TypeName = "VARCHAR(20)")]
 		public Ganre Ganre { get; set; }
 	}
 

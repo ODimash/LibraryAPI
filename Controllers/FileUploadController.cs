@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using LibraryAPI.Models;
+using LibraryAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Configuration;
+using System.Net;
 
 namespace LibraryAPI.Controllers
 {
@@ -10,87 +14,88 @@ namespace LibraryAPI.Controllers
 	public class FileUploadController : ControllerBase
 	{
 		private readonly IWebHostEnvironment _webHostEnvironment;
+		private readonly IFileUploadService _uploadService;
+		IConfigurationSection _bookCoverFileConf;
+		IConfigurationSection _bookContextFileConf;
+		IConfigurationSection _userPhotoFileConf;
 
-		public FileUploadController(IWebHostEnvironment webHostEnvironment)
+		public FileUploadController(IWebHostEnvironment webHostEnvironment, IConfiguration conf, IFileUploadService uploadService)
 		{
 			_webHostEnvironment = webHostEnvironment;
+			_bookCoverFileConf = conf.GetSection("FileUploadSettings:BookCover");
+			_bookContextFileConf = conf.GetSection("FileUploadSettings:BookContext");
+			_userPhotoFileConf = conf.GetSection("FileUploadSettings:UserPhoto");
+			_uploadService = uploadService;
 		}
 
 		[HttpPost("book-cover/{BookId}")]
 		public async Task<IActionResult> UploadBookCover(int BookId, IFormFile File)
 		{
-			if (File == null || File.Length == 0)
-				return BadRequest("No file uploaded");
-
-			//string RootPath = _webHostEnvironment.WebRootPath ?? _webHostEnvironment.ContentRootPath;
-			var DirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "files", "book-covers");
-			var FilePath = Path.Combine(DirectoryPath, File.FileName);
-
-
-			try
+			_uploadService.ValidateFile(File, _bookCoverFileConf);
+			Book foundBook = _uploadService.FindBookById(BookId);
+			if (foundBook == null)
 			{
-				if (!Directory.Exists(DirectoryPath))
-				{
-					Directory.CreateDirectory(DirectoryPath);
-				}
-				using (var stream = new FileStream(FilePath, FileMode.Create))
-				{
-					await File.CopyToAsync(stream);
-				}
-				return Ok(new { FilePath = FilePath });
+				return NotFound("Notfound book with ID " + BookId);
 			}
-			catch (Exception error)
+
+			var DirectoryPath = Path.Combine("files", "book-covers");
+			var FullPath = Path.Combine(Directory.GetCurrentDirectory(), DirectoryPath);
+			_uploadService.CreateDirectoryIfDoestHas(FullPath);
+
+			var ext = Path.GetExtension(File.FileName).ToLowerInvariant();
+			var FileName = BookId.ToString() + ext;
+			var FilePath = Path.Combine(FullPath, FileName);
+			var FileURI = Path.Combine(DirectoryPath, FileName);
+
+			using (var stream = new FileStream(FilePath, FileMode.Create))
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "File path not found: " + FilePath + "\n" + error);
+				await File.CopyToAsync(stream);
 			}
+			return Ok(new { FileURI });
 		}
 
 		[HttpPost("book-context/{BookId}")]
 		public async Task<IActionResult> UploadBookContext(int BookId, IFormFile File)
 		{
-			if (File == null || File.Length == 0)
-				return BadRequest("No file iploaded");
 
-			var DirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "files", "book-context");
-			var FilePath = Path.Combine(DirectoryPath, File.FileName);
-			try
+			_uploadService.ValidateFile(File, _bookContextFileConf);
+			var DirectoryPath = Path.Combine("files", "book-context");
+			var FullPath = Path.Combine(Directory.GetCurrentDirectory(), DirectoryPath);
+			_uploadService.CreateDirectoryIfDoestHas(FullPath);
+
+			var ext = Path.GetExtension(File.FileName).ToLowerInvariant();
+			var FileName = BookId.ToString() + ext;
+			var FilePath = Path.Combine(FullPath, FileName);
+			var FileURI = Path.Combine(DirectoryPath, FileName);
+
+			using (var stream = new FileStream(FilePath, FileMode.Create))
 			{
-				if (!Directory.Exists(DirectoryPath))
-				{
-					Directory.CreateDirectory(DirectoryPath);
-				}
-				using (var stream = new FileStream(FilePath, FileMode.Create))
-				{
-					await File.CopyToAsync(stream);
-				}
-				return Ok(new { FilePath = FilePath });
+				await File.CopyToAsync(stream);
 			}
-			catch (Exception error) 
-			{ 
-				return StatusCode(500, error.Message);
-			}
+			return Ok(new { FileURI });
+
 		}
 
 		[HttpPost("user-photo/{UserId}")]
 		public async Task<IActionResult> UploadUserPhoto(int UserId, IFormFile File)
 		{
-			if (File == null || File.Length == 0)
-				return BadRequest("No file uploaded");
+			_uploadService.ValidateFile(File, _userPhotoFileConf);
+			var DirectoryPath = Path.Combine("files", "user-photo");
+			var FullPath = Path.Combine(Directory.GetCurrentDirectory(), DirectoryPath);
+			_uploadService.CreateDirectoryIfDoestHas(FullPath);
 
-			var DirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "files", "user-photo");
-			var FilePath = Path.Combine(DirectoryPath, File.FileName);
-
-			if (!Directory.Exists (DirectoryPath))
-			{
-				Directory.CreateDirectory(DirectoryPath);
-			}
+			var ext = Path.GetExtension(File.FileName).ToLowerInvariant();
+			var FileName = UserId.ToString() + ext;
+			var FilePath = Path.Combine(FullPath, FileName);
+			var FileURI = Path.Combine(DirectoryPath, FileName);
 
 			using (var stream = new FileStream(FilePath, FileMode.Create))
 			{
 				await File.CopyToAsync(stream);
 			}
 
-			return Ok(new { FilePath = FilePath });
+			return Ok(new { FileURI });
 		}
+
 	}
 }

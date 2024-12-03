@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using LibraryAPI.Models;
 using LibraryAPI.Services.Implaments;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,8 +78,13 @@ builder.Services.AddSwaggerGen(opt =>
 	});
 });
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 builder.Services.AddSingleton<IPasswordHasher<User>,  PasswordHasher<User>>();
-
+builder.Services.AddLogging(config =>
+{
+	config.AddConsole();
+	config.AddDebug();
+});
 // Configure JWT authentication
 
 
@@ -96,10 +102,18 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseStaticFiles();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+	FileProvider = new PhysicalFileProvider(
+		Path.Combine(builder.Environment.ContentRootPath, "files")),
+	RequestPath = "/files"
+});
+
 
 app.MapControllers();
 
